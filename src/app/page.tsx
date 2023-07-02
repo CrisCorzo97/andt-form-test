@@ -1,95 +1,118 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+import { PlusOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Cascader,
+  Checkbox,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  Slider,
+  Switch,
+  TreeSelect,
+  Upload,
+} from "antd";
 
-export default function Home() {
+const { RangePicker } = DatePicker;
+const { TextArea } = Input;
+
+const normFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e?.fileList;
+};
+
+const FormTest: React.FC = () => {
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <Form
+      labelCol={{ span: 4 }}
+      wrapperCol={{ span: 14 }}
+      layout="horizontal"
+      style={{ maxWidth: 600 }}
+    >
+      <Form.Item label="Checkbox" name="disabled" valuePropName="checked">
+        <Checkbox>Checkbox</Checkbox>
+      </Form.Item>
+      <Form.Item label="Radio">
+        <Radio.Group>
+          <Radio value="apple"> Apple </Radio>
+          <Radio value="pear"> Pear </Radio>
+        </Radio.Group>
+      </Form.Item>
+      <Form.Item label="Input">
+        <Input />
+      </Form.Item>
+      <Form.Item label="Select">
+        <Select>
+          <Select.Option value="demo">Demo</Select.Option>
+        </Select>
+      </Form.Item>
+      <Form.Item label="TreeSelect">
+        <TreeSelect
+          treeData={[
+            {
+              title: "Light",
+              value: "light",
+              children: [{ title: "Bamboo", value: "bamboo" }],
+            },
+          ]}
         />
-      </div>
+      </Form.Item>
+      <Form.Item label="Cascader">
+        <Cascader
+          options={[
+            {
+              value: "zhejiang",
+              label: "Zhejiang",
+              children: [
+                {
+                  value: "hangzhou",
+                  label: "Hangzhou",
+                },
+              ],
+            },
+          ]}
+        />
+      </Form.Item>
+      <Form.Item label="DatePicker">
+        <DatePicker />
+      </Form.Item>
+      <Form.Item label="RangePicker">
+        <RangePicker />
+      </Form.Item>
+      <Form.Item label="InputNumber">
+        <InputNumber />
+      </Form.Item>
+      <Form.Item label="TextArea">
+        <TextArea rows={4} />
+      </Form.Item>
+      <Form.Item label="Switch" valuePropName="checked">
+        <Switch />
+      </Form.Item>
+      <Form.Item
+        label="Upload"
+        valuePropName="fileList"
+        getValueFromEvent={normFile}
+      >
+        <Upload action="/upload.do" listType="picture-card">
+          <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
+          </div>
+        </Upload>
+      </Form.Item>
+      <Form.Item label="Button">
+        <Button>Button</Button>
+      </Form.Item>
+      <Form.Item label="Slider">
+        <Slider />
+      </Form.Item>
+    </Form>
+  );
+};
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
-}
+export default () => <FormTest />;
