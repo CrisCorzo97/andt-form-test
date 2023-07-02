@@ -1,117 +1,118 @@
 "use client";
-import { PlusOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Cascader,
-  Checkbox,
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  Radio,
-  Select,
-  Slider,
-  Switch,
-  TreeSelect,
-  Upload,
-} from "antd";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Select, Space, Upload } from "antd";
+import styles from "./page.module.css";
 
-const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 
 const normFile = (e: any) => {
-  if (Array.isArray(e)) {
-    return e;
-  }
-  return e?.fileList;
+  console.log(e);
 };
 
 const FormTest: React.FC = () => {
+  const [form] = Form.useForm();
+
+  const onFinish = (values: any) => {
+    console.log("Received values of form:", values);
+  };
+
+  const handleChange = () => {
+    form.setFieldsValue({ categories: [] });
+  };
+
   return (
-    <Form
-      labelCol={{ span: 4 }}
-      wrapperCol={{ span: 14 }}
-      layout="horizontal"
-      style={{ maxWidth: 600 }}
-    >
-      <Form.Item label="Checkbox" name="disabled" valuePropName="checked">
-        <Checkbox>Checkbox</Checkbox>
-      </Form.Item>
-      <Form.Item label="Radio">
-        <Radio.Group>
-          <Radio value="apple"> Apple </Radio>
-          <Radio value="pear"> Pear </Radio>
-        </Radio.Group>
-      </Form.Item>
-      <Form.Item label="Input">
-        <Input />
-      </Form.Item>
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item label="TreeSelect">
-        <TreeSelect
-          treeData={[
-            {
-              title: "Light",
-              value: "light",
-              children: [{ title: "Bamboo", value: "bamboo" }],
-            },
-          ]}
-        />
-      </Form.Item>
-      <Form.Item label="Cascader">
-        <Cascader
-          options={[
-            {
-              value: "zhejiang",
-              label: "Zhejiang",
-              children: [
-                {
-                  value: "hangzhou",
-                  label: "Hangzhou",
-                },
-              ],
-            },
-          ]}
-        />
-      </Form.Item>
-      <Form.Item label="DatePicker">
-        <DatePicker />
-      </Form.Item>
-      <Form.Item label="RangePicker">
-        <RangePicker />
-      </Form.Item>
-      <Form.Item label="InputNumber">
-        <InputNumber />
-      </Form.Item>
-      <Form.Item label="TextArea">
-        <TextArea rows={4} />
-      </Form.Item>
-      <Form.Item label="Switch" valuePropName="checked">
-        <Switch />
-      </Form.Item>
-      <Form.Item
-        label="Upload"
-        valuePropName="fileList"
-        getValueFromEvent={normFile}
+    <div className={styles.body}>
+      <Form
+        form={form}
+        wrapperCol={{ span: 20 }}
+        size="large"
+        onFinish={onFinish}
       >
-        <Upload action="/upload.do" listType="picture-card">
-          <div>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>Upload</div>
-          </div>
-        </Upload>
-      </Form.Item>
-      <Form.Item label="Button">
-        <Button>Button</Button>
-      </Form.Item>
-      <Form.Item label="Slider">
-        <Slider />
-      </Form.Item>
-    </Form>
+        <Form.Item
+          name="principal-image"
+          label="Imagen principal"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+        >
+          <Upload action="/upload.do" listType="picture-card">
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </div>
+          </Upload>
+        </Form.Item>
+        <Form.Item name="title" label="Título">
+          <Input />
+        </Form.Item>
+        <Form.Item name="category" label="Categoría">
+          <Select onChange={handleChange}>
+            <Select.Option value="demo">Demo</Select.Option>
+          </Select>
+        </Form.Item>
+        <Form.List name="toppics">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <Space
+                  key={key}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginBottom: 8,
+                  }}
+                  align="baseline"
+                >
+                  <Form.Item
+                    {...restField}
+                    name={[name, "subtitle"]}
+                    label="Subtitulo"
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
+                    name={[name, "content"]}
+                    label="Contenido"
+                  >
+                    <TextArea rows={4} />
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
+                    name={[name, "image"]}
+                    label="Imagen"
+                    valuePropName="fileList"
+                    getValueFromEvent={normFile}
+                  >
+                    <Upload action="/upload.do" listType="picture-card">
+                      <div>
+                        <PlusOutlined />
+                        <div style={{ marginTop: 8 }}>Upload</div>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+                  <MinusCircleOutlined onClick={() => remove(name)} />
+                </Space>
+              ))}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}
+                >
+                  Add field
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Crear
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
