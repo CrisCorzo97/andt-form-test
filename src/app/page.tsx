@@ -1,23 +1,81 @@
 "use client";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Select, Space, Upload } from "antd";
+import {
+  MinusCircleOutlined,
+  PlusOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
+import { Button, Form, Input, Select, Space, Upload, message } from "antd";
 import styles from "./page.module.css";
+import axios from "axios";
+import type { UploadChangeParam } from "antd/es/upload";
+import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
+import { useState } from "react";
 
 const { TextArea } = Input;
 
-const normFile = (e: any) => {
-  console.log(e);
+const API_URL = process.env.API_URL;
+
+const getBase64 = (img: RcFile, callback: (url: string) => void) => {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result as string));
+  reader.readAsDataURL(img);
+};
+
+const beforeUpload = (file: RcFile) => {
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("bucketName", "News");
+
+  axios
+    .post("http://localhost:3005/storage/upload", formData)
+    .then((response) => {
+      // Manejar la respuesta del servidor
+      console.log(response.data);
+    })
+    .catch((error) => {
+      // Manejar errores de envío
+      console.error(error);
+    });
 };
 
 const FormTest: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>();
+
+  const handleChange: UploadProps["onChange"] = (
+    info: UploadChangeParam<UploadFile>
+  ) => {
+    if (info.file.status === "uploading") {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      // Get this url from response in real world.
+      getBase64(info.file.originFileObj as RcFile, (url) => {
+        setLoading(false);
+        setImageUrl(url);
+      });
+    }
+  };
+
+  const uploadButton = (
+    <div>
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
   const [form] = Form.useForm();
 
   const onFinish = (values: any) => {
     console.log("Received values of form:", values);
   };
 
-  const handleChange = () => {
-    form.setFieldsValue({ categories: [] });
+  const normFile = (e: any) => {
+    console.log("Upload event:", e);
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
   };
 
   return (
@@ -34,11 +92,22 @@ const FormTest: React.FC = () => {
           valuePropName="fileList"
           getValueFromEvent={normFile}
         >
-          <Upload action="/upload.do" listType="picture-card">
-            <div>
-              <PlusOutlined />
-              <div style={{ marginTop: 8 }}>Upload</div>
-            </div>
+          <Upload
+            name="avatar"
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            beforeUpload={(file) => {
+              beforeUpload(file);
+              return false;
+            }}
+            onChange={handleChange}
+          >
+            {imageUrl ? (
+              <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+            ) : (
+              uploadButton
+            )}
           </Upload>
         </Form.Item>
         <Form.Item name="title" label="Título">
@@ -76,12 +145,12 @@ const FormTest: React.FC = () => {
                   >
                     <TextArea rows={4} />
                   </Form.Item>
-                  <Form.Item
+                  {/* <Form.Item
                     {...restField}
                     name={[name, "image"]}
                     label="Imagen"
                     valuePropName="fileList"
-                    getValueFromEvent={normFile}
+                    getValueFromEvent={uploadImage}
                   >
                     <Upload action="/upload.do" listType="picture-card">
                       <div>
@@ -89,7 +158,7 @@ const FormTest: React.FC = () => {
                         <div style={{ marginTop: 8 }}>Upload</div>
                       </div>
                     </Upload>
-                  </Form.Item>
+                  </Form.Item> */}
                   <MinusCircleOutlined onClick={() => remove(name)} />
                 </Space>
               ))}
